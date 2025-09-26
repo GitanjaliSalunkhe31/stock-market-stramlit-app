@@ -1,28 +1,28 @@
 import streamlit as st
-from client import API_STOCK_MARKET
+from client import STOCK_API
 import plotly.graph_objects as go
-
-## give page title
-st.set_page_config(page_title = "Stock Market App Deployment")
-
+ 
+st.set_page_config(page_title="STOCK MARKET APP", layout='wide')
+ 
 st.title("Stock Market App")
-st.subheader("By Admin")
+st.subheader("by ABC")
+ 
 company = st.text_input("Enter Company Name")
  
 @st.cache_resource(ttl=3600)
 def fetch_data():
-    return API_STOCK_MARKET(api_key=st.secrets["API_KEY"])
+    return STOCK_API(api_key=st.secrets["API_KEY"])
  
-api_stock_market = fetch_data()
-
+stock_api = fetch_data()
+ 
 @st.cache_data(ttl=3600)
 def get_symbol(company_name):
-    return api_stock_market.symbol_search(company_name)
+    return stock_api.symbol_search(company_name)
  
 @st.cache_data(ttl=3600)
 def plot_graph(symbol):
-    df = api_stock_market.daily_data(symbol)
-    fig = api_stock_market.plot_chart(df)
+    df = stock_api.daily_data(symbol)
+    fig = stock_api.plot_chart(df)
     return fig
  
 if company:
@@ -39,3 +39,12 @@ if company:
         st.success(f"**Currency:** {selected_info[2]}")
 
         submit = st.button("plot" , type  = "primary")
+
+
+ 
+        # Show chart immediately
+        if submit:
+            fig = plot_graph(option)
+            st.plotly_chart(fig, use_container_width=True)
+    else:
+        st.warning("No matching company found.")
